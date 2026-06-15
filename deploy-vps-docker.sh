@@ -53,19 +53,6 @@ port_is_busy() {
   return 1
 }
 
-find_host_port() {
-  port="$1"
-  while [ "$port" -le 65535 ]; do
-    if ! port_is_busy "$port"; then
-      echo "$port"
-      return 0
-    fi
-    port=$((port + 1))
-  done
-  echo "No available port found from $1 to 65535." >&2
-  exit 1
-}
-
 if ! command -v docker >/dev/null 2>&1; then
   download_stdout "https://get.docker.com" | $SUDO sh
 fi
@@ -91,14 +78,44 @@ $SUDO docker build -t "$IMAGE_TAG" "$SRC_DIR"
 $SUDO docker volume create "$VOLUME_NAME" >/dev/null
 $SUDO docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
 
-HOST_PORT="$(find_host_port "$HOST_PORT")"
+if port_is_busy "$HOST_PORT"; then
+  echo "Port ${HOST_PORT} is already in use. Free it or rerun with PORT=<port>." >&2
+  exit 1
+fi
 
-$SUDO docker run -d \
+CONTAINER_ID="$($SUDO docker run -d \
   --name "$CONTAINER_NAME" \
   --restart unless-stopped \
   -p "${HOST_PORT}:${CONTAINER_PORT}" \
   -v "${VOLUME_NAME}:/data" \
   -e "PORT=${CONTAINER_PORT}" \
-  "$IMAGE_TAG"
+  "$IMAGE_TAG")"
 
-echo "Anom Sheet is running on port ${HOST_PORT}."
+READY=0
+attempt=1
+while [ "$attempt" -le 30 ]; do
+  if command -v curl >/dev/null 2>&1; then
+    if curl -fsS "http://127.0.0.1:${HOST_PORT}/" >/dev/null 2>&1; then
+      READY=1
+      break
+    fi
+  elif command -v wget >/dev/null 2>&1; then
+    if wget -qO- "http://127.0.0.1:${HOST_PORT}/" >/dev/null 2>&1; then
+      READY=1
+      break
+    fi
+  else
+    READY=1
+    break
+  fi
+  attempt=$((attempt + 1))
+  sleep 1
+done
+
+if [ "$READY" -ne 1 ]; then
+  echo "Container started but did not answer successfully on port ${HOST_PORT}." >&2
+  $SUDO docker logs --tail 120 "$CONTAINER_ID" >&2 || true
+  exit 1
+fi
+
+echo "Anom Sheet is running at http://127.0.0.1:${HOST_PORT}/"
