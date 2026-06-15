@@ -4,7 +4,7 @@ set -eu
 APP_NAME="${APP_NAME:-anom-sheet}"
 REPO_ARCHIVE_URL="${REPO_ARCHIVE_URL:-https://github.com/bwwq/anom-sheet/archive/refs/heads/main.tar.gz}"
 IMAGE_TAG="${IMAGE_TAG:-${APP_NAME}:latest}"
-HOST_PORT="${PORT:-3000}"
+HOST_PORT="${PORT:-6699}"
 CONTAINER_PORT="${CONTAINER_PORT:-3000}"
 VOLUME_NAME="${VOLUME_NAME:-${APP_NAME}-data}"
 CONTAINER_NAME="${CONTAINER_NAME:-${APP_NAME}}"

@@ -2,7 +2,7 @@
 
 黑灰风格的多人车卡档案管理站点，用于创建、维护和分享风险部外勤人员档案。
 
-一键安装：`curl -fsSL https://raw.githubusercontent.com/bwwq/anom-sheet/main/deploy-vps-docker.sh | bash`
+一键安装：`curl -fsSL https://raw.githubusercontent.com/bwwq/anom-sheet/main/deploy-vps-docker.sh | PORT=6699 bash`
 
 ## 功能
 
