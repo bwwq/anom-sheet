@@ -40,6 +40,32 @@ download_stdout() {
   fi
 }
 
+port_is_busy() {
+  port="$1"
+  if command -v ss >/dev/null 2>&1; then
+    ss -ltn 2>/dev/null | awk -v port=":$port" '$4 ~ port "$" { found = 1 } END { exit found ? 0 : 1 }'
+    return $?
+  fi
+  if command -v netstat >/dev/null 2>&1; then
+    netstat -ltn 2>/dev/null | awk -v port=":$port" '$4 ~ port "$" { found = 1 } END { exit found ? 0 : 1 }'
+    return $?
+  fi
+  return 1
+}
+
+find_host_port() {
+  port="$1"
+  while [ "$port" -le 65535 ]; do
+    if ! port_is_busy "$port"; then
+      echo "$port"
+      return 0
+    fi
+    port=$((port + 1))
+  done
+  echo "No available port found from $1 to 65535." >&2
+  exit 1
+}
+
 if ! command -v docker >/dev/null 2>&1; then
   download_stdout "https://get.docker.com" | $SUDO sh
 fi
@@ -64,6 +90,9 @@ tar -xzf "$ARCHIVE" -C "$SRC_DIR" --strip-components=1
 $SUDO docker build -t "$IMAGE_TAG" "$SRC_DIR"
 $SUDO docker volume create "$VOLUME_NAME" >/dev/null
 $SUDO docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+
+HOST_PORT="$(find_host_port "$HOST_PORT")"
+
 $SUDO docker run -d \
   --name "$CONTAINER_NAME" \
   --restart unless-stopped \
@@ -71,3 +100,5 @@ $SUDO docker run -d \
   -v "${VOLUME_NAME}:/data" \
   -e "PORT=${CONTAINER_PORT}" \
   "$IMAGE_TAG"
+
+echo "Anom Sheet is running on port ${HOST_PORT}."
