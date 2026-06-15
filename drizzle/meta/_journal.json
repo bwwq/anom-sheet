@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1781526098307,
+      "tag": "0000_skinny_blob",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781527564587,
+      "tag": "0001_elite_joseph",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781529558112,
+      "tag": "0002_tired_deathbird",
+      "breakpoints": true
+    }
+  ]
+}
