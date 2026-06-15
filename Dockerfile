@@ -23,4 +23,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 VOLUME ["/data"]
 
-CMD ["sh", "-c", "cd /app/dist/server && pnpm exec wrangler dev --local --config wrangler.json --ip 0.0.0.0 --port ${PORT:-3000} --persist-to /data/wrangler --log-level warn --show-interactive-dev-session=false"]
+CMD ["sh", "-c", "/app/node_modules/.bin/wrangler dev --local --cwd /app/dist/server --config /app/dist/server/wrangler.json --ip 0.0.0.0 --port ${PORT:-3000} --persist-to /data/wrangler --log-level warn --show-interactive-dev-session=false"]

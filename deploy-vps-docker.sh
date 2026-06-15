@@ -115,6 +115,7 @@ done
 if [ "$READY" -ne 1 ]; then
   echo "Container started but did not answer successfully on port ${HOST_PORT}." >&2
   $SUDO docker logs --tail 120 "$CONTAINER_ID" >&2 || true
+  $SUDO docker rm -f "$CONTAINER_ID" >/dev/null 2>&1 || true
   exit 1
 fi
 
