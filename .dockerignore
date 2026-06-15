@@ -1,0 +1,16 @@
+.git
+.codex
+.next
+.wrangler
+dist
+node_modules
+coverage
+out
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.env*
+风险部外勤人员档案.pdf
+风险部外勤人员档案_AI可读保留版.md
